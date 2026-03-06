@@ -2,50 +2,12 @@
   "name": "dev-workflow",
   "version": "1.0.0",
   "description": "Enforces testing and deployment subagents after development",
-  "author": "your-name",
-  "commands": [
-    {
-      "name": "ship",
-      "description": "Run testing + deployment agents on current changes",
-      "source": "commands/ship.md"
-    }
-  ],
+  "author": {
+    "name": "Your Name"
+  },
+  "commands": ["./commands/ship.md"],
   "agents": [
-    {
-      "name": "testing-agent",
-      "description": "Runs tests and validates changes",
-      "source": "agents/testing-agent.md"
-    },
-    {
-      "name": "deployment-agent",
-      "description": "Handles deployment after tests pass",
-      "source": "agents/deployment-agent.md"
-    }
-  ],
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "touch /tmp/claude-dev-session-active"
-          }
-        ],
-        "description": "Flag that source files were edited"
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-dev-agents.sh\""
-          }
-        ],
-        "description": "Invoke testing and deployment subagents after dev work"
-      }
-    ]
-  }
+    "./agents/tester-agent.md",
+    "./agents/deployer-agent.md"
+  ]
 }
