@@ -9,3 +9,5 @@ IMPORTANT: NEVER use Edit, Write, or Bash (for code changes) without first invok
 [swe-router]|entry: ./plugins/swe-plugin/skills/swe-router/SKILL.md
 
 ---
+
+**CRITICAL** for each task and user request maintain ROUTER_AUDIT.md file, each time the router routes to a SKILL/AGENT, add the trail on this AUDIT file.
