@@ -138,11 +138,12 @@ Load `deploy-validate` directly.
 
 ### `full-dev`
 **Full Development Pipeline:** code-generation → tester-agent → deploy → deploy-validate
+**Critical:**  for all code generation tasks or feature implementation use the full-dev cycle
 
 ```
 → skills/code-generation/SKILL.md
 → agents/tester-agent.md          (only if tests exist / Makefile has test target)
-→ skills/deploy/SKILL.md          (only after tests pass)
+→ skills/deploy/SKILL.md          (deploy to test env) (only after tests pass)
 → skills/deploy-validate/SKILL.md
 ```
 
@@ -180,15 +181,10 @@ If the intent spans multiple categories (e.g., user asks to "build a feature"):
 router:
   entry: skills/swe-router/SKILL.md
   always_invoked: true
-  bypass_phrases:
-    - "don't use cc10x"
-    - "without cc10x"
-    - "skip cc10x"
   pipelines:
     plan:          [agents/planner-agent.md]
     frontend-ui:   [skills/frontend-ui-design/SKILL.md, skills/code-generation/SKILL.md]
     frontend-dev:  [skills/frontend-development/SKILL.md, skills/code-generation/SKILL.md]
-    code:          [skills/code-generation/SKILL.md]
     test:          [agents/tester-agent.md]
     deploy:        [skills/deploy/SKILL.md, skills/deploy-validate/SKILL.md]
     deploy-new:    [skills/deploy-new-app/SKILL.md, skills/deploy-validate/SKILL.md]
