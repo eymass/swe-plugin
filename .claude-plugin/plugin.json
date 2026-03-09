@@ -1,13 +1,14 @@
 {
-  "name": "dev-workflow",
+  "name": "swe-plugin",
   "version": "1.0.0",
-  "description": "Enforces testing and deployment subagents after development",
+  "description": "Provides all in one, orchestration, development, testing, validation, deployments, system design, planning",
   "author": {
-    "name": "Your Name"
+    "name": "eymas"
   },
   "commands": ["./commands/ship.md"],
   "agents": [
     "./agents/tester-agent.md",
-    "./agents/deployer-agent.md"
+    "./agents/deployer-agent.md",
+    "./agents/planner-agent.md"
   ]
 }
