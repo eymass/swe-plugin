@@ -143,22 +143,25 @@ Load `deploy-validate` directly.
 ```
 → skills/code-generation/SKILL.md
 → agents/tester-agent.md          (only if tests exist / Makefile has test target)
-→ skills/deploy/SKILL.md          (deploy to test env) (only after tests pass)
+→ skills/deploy/SKILL.md          (deploy to test env, only after tests pass / Makefile has deploy targets)
 → skills/deploy-validate/SKILL.md
 ```
+
+**Memory**
+- **Audit:** create ROUTER-AUDIT.md to save each routing and gate transition
 
 **Rules:**
 - Run each step sequentially — never in parallel
 - **Gate:** Do not proceed to `deploy` if tester-agent reports failures
 - **Gate:** Do not proceed to `deploy-validate` if deploy fails
-- Report status after each step before proceeding
+- Report status after each step before proceeding and save to **Audit:**
 
 ---
 
 ## Step 3 — Pipeline Execution Rules
 
 1. **Always sequential.** Never skip a step. Gates between steps are mandatory.
-2. **Report at each gate.** After each step, state the outcome before moving to the next.
+2. **Report at each gate.** After each step, state the outcome before moving to the next. and save to **Audit:**
 3. **Fail fast.** If a step fails, stop and report. Do not continue downstream steps.
 4. **Single responsibility.** Each skill/agent does one thing. The router connects them.
 5. **No improvisation.** If the intent doesn't match any category above, default to `code`.
@@ -170,7 +173,7 @@ Load `deploy-validate` directly.
 If the intent spans multiple categories (e.g., user asks to "build a feature"):
 
 1. Default to `full-dev` pipeline
-2. Skip deploy steps if no environment is specified
+2. Default to `deploy` to test environment if the tools/skills supports it
 3. If truly unclear, use `AskUserQuestion` to clarify before routing
 
 ---
