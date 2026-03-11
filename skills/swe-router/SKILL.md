@@ -77,14 +77,24 @@ Invoke the planner agent. It will gather context, design the solution, and produ
 
 ---
 
-### `code`
-**Pipeline:** code-generation
+### `quick-dev`
+**Pipeline:** quick-dev
 
 ```
 → skills/code-generation/SKILL.md
 ```
 
-Load `code-generation`. Answer Universal Questions first, then implement.
+**Quick Development Pipeline:** code-generation → tester-agent
+**Critical:**  only for code generation tasks that doesnt affect the product, for feature implementation use the full-dev cycle
+
+```
+→ skills/code-generation/SKILL.md
+→ agents/tester-agent.md          (only if tests exist / Makefile has test target)
+```
+
+**Rules:**
+- Run each step sequentially — never in parallel
+- Report status after each step before proceeding and save to **Audit:**
 
 ---
 
@@ -147,9 +157,6 @@ Load `deploy-validate` directly.
 → skills/deploy-validate/SKILL.md
 ```
 
-**Memory**
-- **Audit:** create ROUTER-AUDIT.md to save each routing and gate transition
-
 **Rules:**
 - Run each step sequentially — never in parallel
 - **Gate:** Do not proceed to `deploy` if tester-agent reports failures
@@ -160,8 +167,11 @@ Load `deploy-validate` directly.
 
 ## Step 3 — Pipeline Execution Rules
 
+**Memory**
+- **Audit:** when running a pipeline create ROUTER-AUDIT.md to save each routing and gate transition
+
 1. **Always sequential.** Never skip a step. Gates between steps are mandatory.
-2. **Report at each gate.** After each step, state the outcome before moving to the next. and save to **Audit:**
+2. **Report at each gate.** After each step, state the outcome before moving to the next. and save to memory **Audit:**.
 3. **Fail fast.** If a step fails, stop and report. Do not continue downstream steps.
 4. **Single responsibility.** Each skill/agent does one thing. The router connects them.
 5. **No improvisation.** If the intent doesn't match any category above, default to `code`.
@@ -184,6 +194,7 @@ If the intent spans multiple categories (e.g., user asks to "build a feature"):
 router:
   entry: skills/swe-router/SKILL.md
   always_invoked: true
+  audit_routes: true
   pipelines:
     plan:          [agents/planner-agent.md]
     frontend-ui:   [skills/frontend-ui-design/SKILL.md, skills/code-generation/SKILL.md]
