@@ -147,9 +147,9 @@ Load `deploy-validate` directly.
 ---
 
 ### `full-dev`
-**Full Development Pipeline:** code-generation → tester-agent → deploy → deploy-validate
+**Full Development Pipeline (Steps):** code-generation → tester-agent → deploy → deploy-validate
 **Critical:**  for all code generation tasks or feature implementation use the full-dev cycle
-
+**Critical:**  Make sure you execute each step and step-by-step and never skip any
 ```
 → skills/code-generation/SKILL.md
 → agents/tester-agent.md          (only if tests exist / Makefile has test target)
@@ -158,10 +158,10 @@ Load `deploy-validate` directly.
 ```
 
 **Rules:**
-- Run each step sequentially — never in parallel
+- Run each step sequentially — never in parallel, never skip
 - **Gate:** Do not proceed to `deploy` if tester-agent reports failures
 - **Gate:** Do not proceed to `deploy-validate` if deploy fails
-- Report status after each step before proceeding and save to **Audit:**
+- Report status after each step before proceeding and save to **Audit**
 
 ---
 
