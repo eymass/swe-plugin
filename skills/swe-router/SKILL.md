@@ -75,28 +75,6 @@ Invoke the planner agent. It will gather context, design the solution, and produ
 1. Load `frontend-development` for component architecture, state, accessibility
 2. Load `code-generation` to implement following project patterns
 
----
-
-### `quick-dev`
-**Pipeline:** quick-dev
-
-```
-→ skills/code-generation/SKILL.md
-```
-
-**Quick Development Pipeline:** code-generation → tester-agent
-**Critical:**  only for code generation tasks that doesnt affect the product, for feature implementation use the full-dev cycle
-
-```
-→ skills/code-generation/SKILL.md
-→ agents/tester-agent.md          (only if tests exist / Makefile has test target)
-```
-
-**Rules:**
-- Run each step sequentially — never in parallel
-- Report status after each step before proceeding and save to **Audit:**
-
----
 
 ### `test`
 **Pipeline:** tester-agent
