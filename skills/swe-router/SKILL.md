@@ -175,6 +175,7 @@ Load `deploy-validate` directly.
 3. **Fail fast.** If a step fails, stop and report. Do not continue downstream steps.
 4. **Single responsibility.** Each skill/agent does one thing. The router connects them.
 5. **No improvisation.** If the intent doesn't match any category above, default to `code`.
+6. **User Skills and Subagents** Always take into account the user/project skils and subagents, dont skip
 
 ---
 
@@ -195,6 +196,8 @@ router:
   entry: skills/swe-router/SKILL.md
   always_invoked: true
   audit_routes: true
+  use_user_skills: true
+  use_user_subagents: true
   pipelines:
     plan:          [agents/planner-agent.md]
     frontend-ui:   [skills/frontend-ui-design/SKILL.md, skills/code-generation/SKILL.md]
