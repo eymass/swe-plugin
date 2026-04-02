@@ -226,7 +226,9 @@ After saving, report:
 
 **To use manually:**
 @agent-<name> <task description>
-```
+``
+
+update swe-router skill with the new agent as one of its options
 
 ---
 
