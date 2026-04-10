@@ -9,6 +9,10 @@
   "agents": [
     "./agents/tester-agent.md",
     "./agents/deployer-agent.md",
-    "./agents/planner-agent.md"
+    "./agents/planner-agent.md",
+    "./agents/blueprint.md",
+    "./agents/challenger.md",
+    "./agents/probe.md",
+    "./agents/launcher.md"
   ]
 }
