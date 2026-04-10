@@ -13,6 +13,7 @@
     "./agents/blueprint.md",
     "./agents/challenger.md",
     "./agents/probe.md",
-    "./agents/launcher.md"
+    "./agents/launcher.md",
+    "./agents/ux-designer.md"
   ]
 }
