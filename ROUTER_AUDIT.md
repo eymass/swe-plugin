@@ -1,5 +1,22 @@
 # Router Audit
 
+## 2026-04-10 — Create `ux-designer` Agent
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `code` | ✅ |
+| 3 | Skill loaded: `skills/create-subagent/SKILL.md` | ✅ |
+| 4 | Explored existing agents for format reference | ✅ |
+| 5 | Agent created: `agents/ux-designer.md` | ✅ |
+| 6 | `plugin.json` updated with new agent registration | ✅ |
+
+**Task:** Turn "Practical UI/UX Design Workflow" content into a structured agent under `/agents`  
+**Pipeline:** `code` → create-subagent skill  
+**Agent produced:** `agents/ux-designer.md` — principal UI/UX design expert with structured input/output
+
+---
+
 ## 2026-04-10 — Create/Rewrite 4 Subagents
 
 | Step | Route | Status |
