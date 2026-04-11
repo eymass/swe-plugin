@@ -1,5 +1,41 @@
 # Router Audit
 
+## 2026-04-11 — Register `swe-system-design` in swe-router
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `code` | ✅ |
+| 3 | Skill loaded: `skills/code-implementation/SKILL.md` | ✅ |
+| 4 | Added `system-design` intent to router detection table | ✅ |
+| 5 | Added `system-design` pipeline section to router | ✅ |
+| 6 | Added `system-design` entry to Router Contract YAML | ✅ |
+
+**Task:** Wire `swe-system-design` agent into swe-router as a first-class intent
+**Pipeline:** `code` → code-implementation skill
+**Changes:** `skills/swe-router/SKILL.md` — new intent, pipeline block, and contract entry
+
+---
+
+## 2026-04-11 — Create `swe-system-design` Agent
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `code` | ✅ |
+| 3 | Skill loaded: `skills/code-implementation/SKILL.md` | ✅ |
+| 4 | Explored existing agents for format reference | ✅ |
+| 5 | Agent created: `agents/swe-system-design.md` (metadata + when-to-use only) | ✅ |
+| 6 | `plugin.json` updated with new agent registration | ✅ |
+
+**Task:** Add new `swe-system-design` agent with metadata and when-to-use section (no body)
+**Pipeline:** `code` → code-implementation skill
+**Agent produced:** `agents/swe-system-design.md` — system design specialist for architecture, ADRs, technology selection, and scalability design
+
+---
+
+
+
 ## 2026-04-10 — Create `ux-designer` Agent
 
 | Step | Route | Status |

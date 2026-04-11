@@ -22,6 +22,7 @@ Read the user's request and classify it into one of the intent categories below.
 
 | Intent | Signals |
 |--------|---------|
+| `system-design` | system design, architecture, service design, bounded context, ADR, architecture decision, scalability design, data model, capacity planning, service boundary, tech selection, technology selection, design document, DESIGN.md |
 | `plan` | plan, design, architect, roadmap, strategy, how should I, what's the best way, diagram |
 | `frontend` | ui, design, visual, layout, component, page, dashboard, css, html, artifact, mockup, react, state, hook, form, accessibility, animation, frontend, responsive |
 | `code` | implement, build, write, add, create, function, endpoint, API, backend, fix, bug, debug, refactor, modify |
@@ -35,6 +36,17 @@ Read the user's request and classify it into one of the intent categories below.
 ## Step 2 — Execute Pipeline
 
 Each intent maps to a sequential pipeline. Execute each step in order. **Do not skip steps.**
+
+---
+
+### `system-design`
+**Pipeline:** swe-system-design
+
+```
+→ agents/swe-system-design.md
+```
+
+Invoke the system design agent. It follows the full multi-phase design methodology: problem decomposition, domain modeling, architecture design, data layer, API contracts, failure modes, and produces a `features/<feature-name>/DESIGN.md` artifact.
 
 ---
 
@@ -164,6 +176,7 @@ router:
   use_user_skills: true
   use_user_subagents: true
   pipelines:
+    system-design:      [agents/swe-system-design.md]
     plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md]
     frontend:           [skills/frontend-development/SKILL.md, skills/code-implementation/SKILL.md]
     code:               [skills/code-implementation/SKILL.md]

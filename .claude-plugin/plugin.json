@@ -19,6 +19,7 @@
     "./agents/swe-tester-agent.md",
     "./agents/swe-deployer-agent.md",
     "./agents/heroku-deployer-agent.md",
-    "./agents/error-triage-agent.md"
+    "./agents/error-triage-agent.md",
+    "./agents/swe-system-design.md"
   ]
 }
