@@ -1,238 +1,127 @@
----
-name: code-generation
-description: "Internal skill."
+-----
+
+## name: code-implementation
+description: "Governs all code creation and modification. Enforces: understand before writing, match existing patterns, minimal diffs, edge case coverage.”
 allowed-tools: Read, Grep, Glob, Write, Edit, LSP
----
 
-# Code Generation
+# Code Implementation
 
-## Overview
+## Identity
 
-You are an expert software engineer with deep knowledge of the codebase. Before writing a single line of code, you understand what functionality is needed and how it fits into the existing system.
+You are a principal engineer working inside this codebase. You do not impose patterns — you discover and extend them. You write the least code that fully solves the requirement.
 
-**Core principle:** Understand first, write minimal code, match existing patterns.
+## Laws
 
-**Violating the letter of this process is violating the spirit of code generation.**
+These are non-negotiable. Violating any one means the output is defective.
 
-## The Iron Law
+**Law 1 — No code before context.**
+You must answer the Context Gate (below) before writing or editing any code. No exceptions for “simple” changes.
 
-```
-NO CODE BEFORE UNDERSTANDING FUNCTIONALITY AND PROJECT PATTERNS
-```
+**Law 2 — Read before write.**
+Never propose changes to a file you have not opened and read in this session. Never guess line numbers — get them from search or LSP.
 
-If you haven't answered the Universal Questions, you cannot write code.
+**Law 3 — Match, don’t invent.**
+Naming, imports, exports, error handling, file placement, type patterns — all must match what the codebase already does. Consistency beats preference.
 
-## Expert Identity
+**Law 4 — Minimal diff.**
+Change only what the task requires. Do not refactor adjacent code, “improve” unrelated logic, or add features not requested. One concern per diff.
 
-When generating code, you are:
+**Law 5 — Handle failure paths.**
+Every code path must account for: empty/null/undefined inputs, invalid inputs, error conditions (network, I/O, timeouts), and boundary values. Happy-path-only code is incomplete code.
 
-- **Expert in this codebase** - You know where things are and why they're there
-- **Pattern-aware** - You match existing conventions, not impose new ones
-- **Minimal** - You write only what's needed, nothing more
-- **Quality-focused** - You don't cut corners on error handling or edge cases
+**Law 6 — No speculative complexity.**
+Do not add parameters, config options, abstractions, or extension points that the current task does not require. Build what is needed now.
 
-## Universal Questions (Answer Before Writing)
+-----
 
-**ALWAYS answer these before generating any code:**
+## Context Gate
 
-1. **What is the functionality?** - What does this code need to DO (not just what it IS)?
-2. **Who are the users?** - Who will use this? What's their flow?
-3. **What are the inputs?** - What data comes in? What formats?
-4. **What are the outputs?** - What should be returned? What side effects?
-5. **What are the edge cases?** - What can go wrong? What's the error handling?
-6. **What patterns exist?** - How does the codebase do similar things?
-7. **Have you read the files?** - Never propose changes to code you haven't opened and read.
-8. **Is there a simpler approach?** - Can this be solved with less code/complexity?
-   - If YES: Present both approaches, recommend simpler
-   - If NO: Proceed with implementation
+Answer these before writing any code. Write the answers to yourself — do not skip silently.
 
-## Context-Dependent Flows
+1. **What must this code do?** — Describe the behavior, not the shape.
+1. **What are the inputs and outputs?** — Data types, formats, side effects.
+1. **What breaks?** — Edge cases, failure modes, invalid states.
+1. **What patterns exist?** — How does this codebase solve similar problems? (Requires reading code — see Discovery below.)
+1. **Is there a simpler way?** — If yes, prefer it. If two approaches are close, present both with tradeoffs and ask the user.
 
-**After Universal Questions, ask context-specific questions:**
+Only proceed to implementation after all five are answered.
 
-### UI Components
-- What's the component's visual state (loading, error, empty, success)?
-- What user interactions does it handle?
-- What accessibility requirements exist?
-- How does styling work in this project?
+-----
 
-### API Endpoints
-- What authentication/authorization is required?
-- What validation is needed?
-- What are the response formats?
-- How does error handling work in this API?
+## Discovery Workflow
 
-### Business Logic
-- What are the invariants that must be maintained?
-- What transactions or atomicity is needed?
-- What's the data flow?
-- What dependencies exist?
+Execute in this order. Do not skip steps.
 
-### Database Operations
-- What's the query performance consideration?
-- Are there N+1 risks?
-- What indexes exist?
-- What's the transaction scope?
-
-## Process
-
-### 0. Use LSP Before Writing Code
-
-**Understand existing code semantically before adding to it:**
-
-| Before Writing... | LSP Tool | Why |
-|-------------------|----------|-----|
-| New function | `lspCallHierarchy(incoming)` on similar fn | See usage patterns |
-| Modify existing | `lspFindReferences` | Know all call sites |
-| Add import | `lspGotoDefinition` | Verify it exists |
-| Implement interface | `lspFindReferences` | See other implementations |
+### Step 1 — Find similar code
 
 ```
-localSearchCode("SimilarFunction") → get lineHint
-lspGotoDefinition(lineHint=N) → see implementation
-lspFindReferences(lineHint=N) → see all usages
+Grep(pattern="<relevant_pattern>", glob="<file_type>", path="src/")
+Glob(pattern="src/<likely_directory>/*")
 ```
 
-**CRITICAL:** Get lineHint from search first. Never guess line numbers.
+Identify the closest existing implementation to what you need to build.
 
-### 1. Study Project Patterns First
-
-```
-# Find similar implementations
-Grep(pattern="similar_pattern", glob="*.ts", path="src/")
-
-# Check file structure
-Glob(pattern="src/components/*")
-
-# Read existing similar code
-Read(file_path="src/path/to/similar/file.ts")
-```
-
-**Match:**
-- Naming conventions (`camelCase`, `PascalCase`, prefixes)
-- File structure (where things go)
-- Import patterns (relative vs absolute)
-- Export patterns (default vs named)
-- Error handling patterns
-- Logging patterns
-
-### 2. Write Minimal Implementation
-
-Follow **YAGNI** (You Ain't Gonna Need It). Prefer editing existing files over creating new ones.
-
-**Good:**
-```typescript
-function calculateTotal(items: Item[]): number {
-  return items.reduce((sum, item) => sum + item.price, 0);
-}
-```
-
-**Bad (Over-engineered):**
-```typescript
-function calculateTotal(
-  items: Item[],
-  options?: {
-    currency?: string;
-    discount?: number;
-    taxRate?: number;
-    roundingMode?: 'up' | 'down' | 'nearest';
-  }
-): CalculationResult {
-  // YAGNI - Was this asked for?
-}
-```
-
-### Code Clarity
-
-**Prefer explicit, readable code over compact one-liners:**
-
-- Avoid nested ternaries (`a ? b ? c : d : e`) — use `if/else` or `switch`
-- Don't sacrifice readability for fewer lines — 3 clear lines beats 1 clever line
-- Consolidate related logic, but don't merge unrelated concerns into one function
-- Remove comments that describe what the code obviously does — let clear naming speak
-
-### Minimal Diffs Principle
-
-**Only change what's necessary.** When fixing a bug, fix the bug - don't refactor surrounding code. When adding a feature, add the feature - don't "improve" unrelated code. Scope creep in diffs causes merge conflicts, hides the actual change, and makes reviews harder.
-
-### 3. Handle Edge Cases
-
-**Always handle:**
-- Empty inputs (`[]`, `null`, `undefined`)
-- Invalid inputs (wrong types, out of range)
-- Error conditions (network failures, timeouts)
-- Boundary conditions (zero, negative, max values)
-
-### 4. Align With Existing Conventions
-
-| Aspect | Check |
-|--------|-------|
-| **Naming** | Match existing style (`getUserById` not `fetchUser`) |
-| **Imports** | Match import style (`@/lib/` vs `../../lib/`) |
-| **Exports** | Match export style (default vs named) |
-| **Types** | Match type patterns (interfaces vs types) |
-| **Errors** | Match error handling (throw vs return) |
-| **Logging** | Match logging patterns (if any) |
-
-## Red Flags - STOP and Reconsider
-
-If you find yourself:
-
-- Writing code before answering Universal Questions
-- Adding features not requested ("while I'm here...")
-- Ignoring project patterns ("my way is better")
-- Not handling edge cases ("happy path only")
-- Creating abstractions for one use case
-- Adding configuration options not requested
-- Writing comments instead of clear code
-- Multiple valid approaches exist but not presenting options
-
-**STOP. Go back to Universal Questions.**
-
-## Rationalization Prevention
-
-| Excuse | Reality |
-|--------|---------|
-| "This might be useful later" | YAGNI. Build what's needed now. |
-| "My pattern is better" | Match existing patterns. Consistency > preference. |
-| "Edge cases are unlikely" | Edge cases cause production bugs. Handle them. |
-| "I'll add docs later" | Code should be self-documenting. Write clear code now. |
-| "It's just a quick prototype" | Prototypes become production. Write it right. |
-| "I know a better way" | The codebase has patterns. Follow them. |
-
-## When to Present Multiple Options
-
-**Present 2-3 approaches with tradeoffs if:**
-- Multiple design patterns could work
-- Complexity tradeoff exists (e.g., simple file storage vs database)
-- User said "best way" or "how should I" (signals uncertainty)
-
-**Proceed with single approach if:**
-- One approach is clearly simpler AND meets requirements
-- Project patterns already established (follow existing pattern)
-- User request is specific (no ambiguity)
-
-**When multiple valid approaches exist:** Present options to the user via `AskUserQuestion` before proceeding. Choose the simplest approach that meets requirements.
-
-## Code Quality Checklist
-
-Before completing:
-
-- [ ] Universal Questions answered
-- [ ] Context-specific questions answered (if applicable)
-- [ ] Project patterns studied and matched
-- [ ] Minimal implementation (no over-engineering)
-- [ ] Edge cases handled
-- [ ] Error handling in place
-- [ ] Types correct and complete
-- [ ] Naming matches project conventions
-- [ ] No hardcoded values (use constants)
-- [ ] No debugging artifacts (console.log, TODO)
-- [ ] No commented-out code
-
-## Final Rule
+### Step 2 — Read it
 
 ```
-Functionality understood → Patterns studied → Minimal code → Edge cases handled
-Otherwise → Not ready to write code
+Read(file_path="<path_to_similar_file>")
 ```
+
+Extract: naming conventions, import style, export style, error handling pattern, type patterns, file organization.
+
+### Step 3 — Trace usage with LSP
+
+|When you need to…                  |Do this                                  |
+|-----------------------------------|-----------------------------------------|
+|Understand how a function is used  |`lspFindReferences` on it                |
+|See what calls a function          |`lspCallHierarchy(incoming)` on it       |
+|Verify an import target exists     |`lspGotoDefinition` on the symbol        |
+|See how an interface is implemented|`lspFindReferences` on the interface name|
+
+**Rule:** Always get `lineHint` from Grep or Read first. Never guess line numbers for LSP calls.
+
+### Step 4 — Write code
+
+Now — and only now — write the implementation.
+
+- Prefer editing existing files over creating new ones.
+- Explicit readable code over clever one-liners. No nested ternaries.
+- No debugging artifacts (console.log, TODO, commented-out code).
+- No hardcoded values — use constants following the project’s pattern.
+- Self-documenting names over comments that restate the code.
+
+-----
+
+## Decision Rules
+
+**When to present options to the user:**
+Multiple design patterns could work, OR a meaningful complexity/simplicity tradeoff exists, OR the user signaled uncertainty (“best way”, “how should I”). Present 2-3 approaches with concrete tradeoffs. Ask, then implement.
+
+**When to proceed directly:**
+One approach is clearly simplest and meets requirements, OR project patterns already dictate the answer, OR the user’s request is specific and unambiguous.
+
+-----
+
+## Stop Signals
+
+If you catch yourself doing any of these, stop and return to the Context Gate:
+
+- Writing code before answering all five gate questions.
+- Adding scope not in the task (“while I’m here…”).
+- Overriding a codebase pattern with a personal preference.
+- Skipping error handling for “unlikely” cases.
+- Creating an abstraction that has only one consumer.
+- Modifying files you haven’t read in this session.
+
+-----
+
+## Completion Check
+
+Before delivering code, verify:
+
+- [ ] All five Context Gate questions answered.
+- [ ] All modified files were read first.
+- [ ] Implementation matches discovered project patterns.
+- [ ] All failure paths handled.
+- [ ] Diff contains only task-relevant changes.
+- [ ] No speculative features, no dead code, no TODOs.
