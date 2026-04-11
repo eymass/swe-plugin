@@ -109,21 +109,23 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 ---
 
 ### `dev-implementation`
-**Full Development Pipeline:** code-implementation → swe-tester-agent → heroku-cloud (deploy) → heroku-cloud (validate)
+**Full Development Pipeline:** code-implementation → swe-tester-agent → heroku-cloud (deploy) → heroku-cloud (validate) → swe-documentation
 **Critical:** For all code generation tasks or feature implementation use the dev-implementation cycle.
 **Critical:** Execute each step sequentially and never skip any.
 
 ```
 → skills/code-implementation/SKILL.md
-→ agents/swe-tester-agent.md          (only if tests exist / Makefile has test target)
-→ skills/heroku-cloud/SKILL.md        (deploy to test env, only after tests pass)
-→ skills/heroku-cloud/SKILL.md        (validate — check logs and HTTP status)
+→ agents/swe-tester-agent.md                (only if tests exist / Makefile has test target)
+→ skills/heroku-cloud/SKILL.md              (deploy to test env, only after tests pass)
+→ skills/heroku-cloud/SKILL.md              (validate — check logs and HTTP status)
+→ skills/swe-documentation/SKILL.md         (always — update ARCHITECTURE.md / create ADR if arch changed)
 ```
 
 **Rules:**
 - Run each step sequentially — never in parallel, never skip
 - **Gate:** Do not proceed to deploy if swe-tester-agent reports failures
 - **Gate:** Do not proceed to validate if deploy fails
+- **swe-documentation always runs** — it self-assesses whether the task changed the architecture and exits cleanly if not
 - Report status after each step before proceeding and save to **Audit**
 
 ---
@@ -168,8 +170,9 @@ router:
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
-    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-tester-agent.md, skills/heroku-cloud/SKILL.md, skills/heroku-cloud/SKILL.md]
+    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-tester-agent.md, skills/heroku-cloud/SKILL.md, skills/heroku-cloud/SKILL.md, skills/swe-documentation/SKILL.md]
   gates:
     - after: swe-tester-agent → before: deploy (tests must pass)
     - after: deploy → before: validate (deploy must succeed)
+    - after: validate → swe-documentation (always runs, self-assesses impact)
 ```
