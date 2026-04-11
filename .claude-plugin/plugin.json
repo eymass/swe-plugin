@@ -1,19 +1,24 @@
 {
   "name": "swe-plugin",
-  "version": "1.0.0",
-  "description": "Provides all in one, orchestration, development, testing, validation, deployments, system design, planning",
+  "version": "1.1.0",
+  "description": "Provides all-in-one orchestration, development, testing, validation, deployments, system design, planning, and architecture documentation",
   "author": {
     "name": "eymas"
   },
-  "commands": ["./commands/ship.md"],
+  "skills": [
+    "./skills/swe-router/SKILL.md",
+    "./skills/code-implementation/SKILL.md",
+    "./skills/frontend-development/SKILL.md",
+    "./skills/heroku-cloud/SKILL.md",
+    "./skills/swe-documentation/SKILL.md",
+    "./skills/create-subagent/SKILL.md"
+  ],
   "agents": [
-    "./agents/tester-agent.md",
-    "./agents/deployer-agent.md",
-    "./agents/planner-agent.md",
-    "./agents/blueprint.md",
-    "./agents/challenger.md",
-    "./agents/probe.md",
-    "./agents/launcher.md",
-    "./agents/ux-designer.md"
+    "./agents/swe-planner.md",
+    "./agents/swe-plan-challenger.md",
+    "./agents/swe-tester-agent.md",
+    "./agents/swe-deployer-agent.md",
+    "./agents/heroku-deployer-agent.md",
+    "./agents/error-triage-agent.md"
   ]
 }

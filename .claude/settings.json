@@ -1,7 +1,4 @@
 {
-  "env": {
-    "CLAUDE_PLUGIN_ROOT": "/Users/computercomputer/claude-plugin"
-  },
   "hooks": {
     "PostToolUse": [
       {

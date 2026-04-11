@@ -1,4 +1,4 @@
-# SWE Orchestration (Always On)
+# SWE Orchestration (Critical, Always)
 
 IMPORTANT: ALWAYS invoke swe-router on ANY development task. First action, no exceptions.
 IMPORTANT: Explore project first, then invoke the router.
