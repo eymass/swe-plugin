@@ -178,7 +178,6 @@ router:
   use_user_subagents: true
   pipelines:
     plan:          [agents/planner-agent.md]
-    frontend-ui:   [skills/frontend-ui-design/SKILL.md, skills/code-generation/SKILL.md]
     frontend-dev:  [skills/frontend-development/SKILL.md, skills/code-generation/SKILL.md]
     test:          [agents/tester-agent.md]
     deploy:        [skills/deploy/SKILL.md, skills/deploy-validate/SKILL.md]
