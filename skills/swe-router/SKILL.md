@@ -133,7 +133,7 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 ## Step 3 — Pipeline Execution Rules
 
 **Memory**
-- **Audit:** when running a pipeline create ROUTER-AUDIT.md to save each routing and gate transition
+- **Audit:** when running a pipeline update/create the ROUTER-AUDIT.md to save each routing and gate transition
 
 1. **Always sequential.** Never skip a step. Gates between steps are mandatory.
 2. **Report at each gate.** After each step, state the outcome before moving to the next. Save to **Audit**.
