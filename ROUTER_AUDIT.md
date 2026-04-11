@@ -40,6 +40,21 @@
 - `agents/probe.md` — test execution specialist (replaces/complements `tester-agent`)
 - `agents/launcher.md` — platform-agnostic deployer (replaces/complements `deployer-agent`)
 
+## 2026-04-02 — Review and fix hooks
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `code` (review + fix) | ✅ |
+| 3 | Skill: `update-config` | ✅ |
+| 4 | Created `.claude/settings.json` with hooks | ✅ |
+
+**Task:** Review hooks and make sure they work  
+**Issues fixed:** hooks not registered in settings.json, `CLAUDE_PLUGIN_ROOT` undefined  
+**Output:** `/Users/computercomputer/claude-plugin/.claude/settings.json`
+
+---
+
 ## 2026-03-31 — Create `create-subagent` skill
 
 | Step | Route | Status |

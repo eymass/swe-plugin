@@ -13,8 +13,8 @@ Execute a deployment to the specified environment using the project's Makefile.
 
 ## Usage
 
-- `/deployer:deploy prod` — Deploy to production (`post-generator-ai`)
-- `/deployer:deploy test` — Deploy to test (`post-generator-ai-test`)
+- `/deployer:deploy prod` — Deploy to production
+- `/deployer:deploy test` — Deploy to test
 - `/deployer:deploy` — Will ask which environment to deploy to
 
 ## Steps
@@ -44,3 +44,40 @@ Execute a deployment to the specified environment using the project's Makefile.
 - Test deployments can proceed without confirmation
 - If the deployment command fails, show the error output and suggest fixes
 - After deployment, always validate using log analysis
+
+
+
+### 2. Create the App
+
+```bash
+./tools/deploy/heroku_new_app.sh <app_name> <env_file>
+```
+
+This script will:
+- Create the Heroku app
+- Set config vars from the env file
+- Add the heroku git remote
+- Deploy the current codebase via `git push heroku main`
+
+### 3. Post-Creation Validation
+- Check the app was created: `heroku apps:info --app <app_name>`
+- Verify config vars were set: `heroku config --app <app_name>`
+- Check deployment status via logs: `heroku logs --app <app_name> -n 100`
+- Verify HTTP response: `curl -s -o /dev/null -w "%{http_code}" https://<app_name>.herokuapp.com`
+
+### 4. Report Results
+
+```
+✅ New App Created Successfully
+   App: <app_name>
+   URL: https://<app_name>.herokuapp.com
+   Config Vars: <count> variables set
+   Status: Running
+```
+
+## Important
+
+- This skill only runs when explicitly invoked (`/deployer:deploy-new-app`)
+- Always confirm the app name and env file with the user before proceeding
+- Never expose secret values from the env file in output
+- If the app name is already taken, suggest an alternative
