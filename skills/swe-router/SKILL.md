@@ -23,14 +23,12 @@ Read the user's request and classify it into one of the intent categories below.
 | Intent | Signals |
 |--------|---------|
 | `plan` | plan, design, architect, roadmap, strategy, how should I, what's the best way, diagram |
-| `frontend-ui` | ui, design, visual, layout, component, page, dashboard, css, html, artifact, mockup |
-| `frontend-dev` | react, state, hook, form, accessibility, animation, frontend, responsive |
+| `frontend` | ui, design, visual, layout, component, page, dashboard, css, html, artifact, mockup, react, state, hook, form, accessibility, animation, frontend, responsive |
 | `code` | implement, build, write, add, create, function, endpoint, API, backend, fix, bug, debug, refactor, modify |
 | `test` | test, spec, tdd, unit test, integration test, run tests |
-| `deploy` | deploy, ship, push to production, push to test, release |
-| `deploy-new` | new app, create app, new heroku, bootstrap app |
+| `deploy` | deploy, ship, push to production, push to test, release, new app, create app, new heroku, bootstrap app |
 | `validate` | validate deployment, check deployment, is it live, health check |
-| `full-dev` | develop AND test AND deploy in one request, "build and ship", "implement and deploy" |
+| `dev-implementation` | develop AND test AND deploy in one request, "build and ship", "implement and deploy" |
 
 ---
 
@@ -41,46 +39,47 @@ Each intent maps to a sequential pipeline. Execute each step in order. **Do not 
 ---
 
 ### `plan`
-**Pipeline:** planner-agent
+**Pipeline:** swe-planner → swe-plan-challenger (if plan is non-trivial)
 
 ```
-→ agents/planner-agent.md
+→ agents/swe-planner.md
+→ agents/swe-plan-challenger.md   (only for plans with >2 phases or >5 components)
 ```
 
-Invoke the planner agent. It will gather context, design the solution, and produce a plan file at `docs/plans/`.
+1. Invoke the planner agent — it gathers context, designs the solution, and produces a plan file at `docs/plans/`
+2. If the plan is non-trivial, invoke the challenger to stress-test it before handing to implementation
 
 ---
 
-### `frontend-ui`
-**Pipeline:** frontend-ui-design → code-generation
-
-```
-→ skills/frontend-ui-design/SKILL.md
-→ skills/code-generation/SKILL.md
-```
-
-1. Load `frontend-ui-design` to establish design direction and produce the UI
-2. Load `code-generation` to implement the component code with correct patterns
-
----
-
-### `frontend-dev`
-**Pipeline:** frontend-development → code-generation
+### `frontend`
+**Pipeline:** frontend-development → code-implementation
 
 ```
 → skills/frontend-development/SKILL.md
-→ skills/code-generation/SKILL.md
+→ skills/code-implementation/SKILL.md
 ```
 
-1. Load `frontend-development` for component architecture, state, accessibility
-2. Load `code-generation` to implement following project patterns
+1. Load `frontend-development` for component architecture, user flow, state, accessibility
+2. Load `code-implementation` to implement following project patterns
 
+---
+
+### `code`
+**Pipeline:** code-implementation
+
+```
+→ skills/code-implementation/SKILL.md
+```
+
+Load `code-implementation` directly.
+
+---
 
 ### `test`
-**Pipeline:** tester-agent
+**Pipeline:** swe-tester-agent
 
 ```
-→ agents/tester-agent.md
+→ agents/swe-tester-agent.md
 ```
 
 Invoke the tester agent. It reads the Makefile and runs the appropriate test targets.
@@ -88,57 +87,43 @@ Invoke the tester agent. It reads the Makefile and runs the appropriate test tar
 ---
 
 ### `deploy`
-**Pipeline:** deploy skill → deploy-validate skill
+**Pipeline:** heroku-cloud
 
 ```
-→ skills/deploy/SKILL.md
-→ skills/deploy-validate/SKILL.md
+→ skills/heroku-cloud/SKILL.md
 ```
 
-1. Load `deploy` — confirm environment, run `make deploy` or `make deploy-test`
-2. Load `deploy-validate` — check logs and HTTP status to confirm success
-
----
-
-### `deploy-new`
-**Pipeline:** deploy-new-app skill → deploy-validate skill
-
-```
-→ skills/deploy-new-app/SKILL.md
-→ skills/deploy-validate/SKILL.md
-```
-
-1. Load `deploy-new-app` — create app, set env vars, push
-2. Load `deploy-validate` — verify the new app is healthy
+Load `heroku-cloud` — handles new app creation, test deployments, and production deployments (with confirmation gate).
 
 ---
 
 ### `validate`
-**Pipeline:** deploy-validate skill
+**Pipeline:** heroku-cloud
 
 ```
-→ skills/deploy-validate/SKILL.md
+→ skills/heroku-cloud/SKILL.md
 ```
 
-Load `deploy-validate` directly.
+Load `heroku-cloud` for log analysis and HTTP health check.
 
 ---
 
-### `full-dev`
-**Full Development Pipeline (Steps):** code-generation → tester-agent → deploy → deploy-validate
-**Critical:**  for all code generation tasks or feature implementation use the full-dev cycle
-**Critical:**  Make sure you execute each step and step-by-step and never skip any
+### `dev-implementation`
+**Full Development Pipeline:** code-implementation → swe-tester-agent → heroku-cloud (deploy) → heroku-cloud (validate)
+**Critical:** For all code generation tasks or feature implementation use the dev-implementation cycle.
+**Critical:** Execute each step sequentially and never skip any.
+
 ```
-→ skills/code-generation/SKILL.md
-→ agents/tester-agent.md          (only if tests exist / Makefile has test target)
-→ skills/deploy/SKILL.md          (deploy to test env, only after tests pass / Makefile has deploy targets)
-→ skills/deploy-validate/SKILL.md
+→ skills/code-implementation/SKILL.md
+→ agents/swe-tester-agent.md          (only if tests exist / Makefile has test target)
+→ skills/heroku-cloud/SKILL.md        (deploy to test env, only after tests pass)
+→ skills/heroku-cloud/SKILL.md        (validate — check logs and HTTP status)
 ```
 
 **Rules:**
 - Run each step sequentially — never in parallel, never skip
-- **Gate:** Do not proceed to `deploy` if tester-agent reports failures
-- **Gate:** Do not proceed to `deploy-validate` if deploy fails
+- **Gate:** Do not proceed to deploy if swe-tester-agent reports failures
+- **Gate:** Do not proceed to validate if deploy fails
 - Report status after each step before proceeding and save to **Audit**
 
 ---
@@ -149,11 +134,11 @@ Load `deploy-validate` directly.
 - **Audit:** when running a pipeline create ROUTER-AUDIT.md to save each routing and gate transition
 
 1. **Always sequential.** Never skip a step. Gates between steps are mandatory.
-2. **Report at each gate.** After each step, state the outcome before moving to the next. and save to memory **Audit:**.
+2. **Report at each gate.** After each step, state the outcome before moving to the next. Save to **Audit**.
 3. **Fail fast.** If a step fails, stop and report. Do not continue downstream steps.
 4. **Single responsibility.** Each skill/agent does one thing. The router connects them.
 5. **No improvisation.** If the intent doesn't match any category above, default to `code`.
-6. **User Skills and Subagents** Always take into account the user/project skils and subagents, dont skip
+6. **User Skills and Subagents.** Always take into account the user/project skills and subagents, don't skip.
 
 ---
 
@@ -161,8 +146,8 @@ Load `deploy-validate` directly.
 
 If the intent spans multiple categories (e.g., user asks to "build a feature"):
 
-1. Default to `full-dev` pipeline
-2. Default to `deploy` to test environment if the tools/skills supports it
+1. Default to `dev-implementation` pipeline
+2. Default to `deploy` to test environment if the tools/skills support it
 3. If truly unclear, use `AskUserQuestion` to clarify before routing
 
 ---
@@ -177,14 +162,14 @@ router:
   use_user_skills: true
   use_user_subagents: true
   pipelines:
-    plan:          [agents/planner-agent.md]
-    frontend-dev:  [skills/frontend-development/SKILL.md, skills/code-generation/SKILL.md]
-    test:          [agents/tester-agent.md]
-    deploy:        [skills/deploy/SKILL.md, skills/deploy-validate/SKILL.md]
-    deploy-new:    [skills/deploy-new-app/SKILL.md, skills/deploy-validate/SKILL.md]
-    validate:      [skills/deploy-validate/SKILL.md]
-    full-dev:      [skills/code-generation/SKILL.md, agents/tester-agent.md, skills/deploy/SKILL.md, skills/deploy-validate/SKILL.md]
+    plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md]
+    frontend:           [skills/frontend-development/SKILL.md, skills/code-implementation/SKILL.md]
+    code:               [skills/code-implementation/SKILL.md]
+    test:               [agents/swe-tester-agent.md]
+    deploy:             [skills/heroku-cloud/SKILL.md]
+    validate:           [skills/heroku-cloud/SKILL.md]
+    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-tester-agent.md, skills/heroku-cloud/SKILL.md, skills/heroku-cloud/SKILL.md]
   gates:
-    - after: tester-agent → before: deploy (tests must pass)
-    - after: deploy → before: deploy-validate (deploy must succeed)
+    - after: swe-tester-agent → before: deploy (tests must pass)
+    - after: deploy → before: validate (deploy must succeed)
 ```
