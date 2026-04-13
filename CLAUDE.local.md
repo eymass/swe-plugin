@@ -6,7 +6,7 @@ IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning for or
 IMPORTANT: Never bypass the router. It is the system.
 IMPORTANT: NEVER use Edit, Write, or Bash (for code changes) without first invoking swe-router.
 
-[swe-router]|entry: ./plugins/swe-plugin/skills/swe-router/SKILL.md
+[swe-router]|entry: swe-plugin:swe-router
 
 ---
 
