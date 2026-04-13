@@ -12,6 +12,7 @@
     "./agents/swe-deployer-agent.md",
     "./agents/heroku-deployer-agent.md",
     "./agents/error-triage-agent.md",
-    "./agents/swe-system-design.md"
+    "./agents/swe-system-design.md",
+    "./agents/swe-linter.md"
   ]
 }

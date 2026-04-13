@@ -25,7 +25,6 @@ Read the user's request and classify it into one of the intent categories below.
 | `system-design` | system design, architecture, service design, bounded context, ADR, architecture decision, scalability design, data model, capacity planning, service boundary, tech selection, technology selection, design document, DESIGN.md |
 | `plan` | plan, design, architect, roadmap, strategy, how should I, what's the best way, diagram |
 | `frontend` | ui, design, visual, layout, component, page, dashboard, css, html, artifact, mockup, react, state, hook, form, accessibility, animation, frontend, responsive |
-| `code` | implement, build, write, add, create, function, endpoint, API, backend, fix, bug, debug, refactor, modify |
 | `test` | test, spec, tdd, unit test, integration test, run tests |
 | `deploy` | deploy, ship, push to production, push to test, release, new app, create app, new heroku, bootstrap app |
 | `validate` | validate deployment, check deployment, is it live, health check |
@@ -76,17 +75,6 @@ Invoke the system design agent. It follows the full multi-phase design methodolo
 
 ---
 
-### `code`
-**Pipeline:** code-implementation
-
-```
-→ skills/code-implementation/SKILL.md
-```
-
-Load `code-implementation` directly.
-
----
-
 ### `test`
 **Pipeline:** swe-tester-agent
 
@@ -121,22 +109,19 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 ---
 
 ### `dev-implementation`
-**Full Development Pipeline:** code-implementation → swe-tester-agent → heroku-cloud (deploy) → heroku-cloud (validate) → swe-documentation
+**Full Development Pipeline:** code-implementation → swe-tester-agent → swe-documentation
 **Critical:** For all code generation tasks or feature implementation use the dev-implementation cycle.
 **Critical:** Execute each step sequentially and never skip any.
 
 ```
 → skills/code-implementation/SKILL.md
-→ agents/swe-tester-agent.md                (only if tests exist / Makefile has test target)
-→ skills/heroku-cloud/SKILL.md              (deploy to test env, only after tests pass)
-→ skills/heroku-cloud/SKILL.md              (validate — check logs and HTTP status)
+→ agents/swe-tester-agent.md                (only if tests exist)
 → skills/swe-documentation/SKILL.md         (always — update ARCHITECTURE.md / create ADR if arch changed)
 ```
 
 **Rules:**
 - Run each step sequentially — never in parallel, never skip
-- **Gate:** Do not proceed to deploy if swe-tester-agent reports failures
-- **Gate:** Do not proceed to validate if deploy fails
+- **Gate:** Do not proceed to swe-documentation if swe-tester-agent reports failures
 - **swe-documentation always runs** — it self-assesses whether the task changed the architecture and exits cleanly if not
 - Report status after each step before proceeding and save to **Audit**
 
@@ -179,13 +164,10 @@ router:
     system-design:      [agents/swe-system-design.md]
     plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md]
     frontend:           [skills/frontend-development/SKILL.md, skills/code-implementation/SKILL.md]
-    code:               [skills/code-implementation/SKILL.md]
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
-    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-tester-agent.md, skills/heroku-cloud/SKILL.md, skills/heroku-cloud/SKILL.md, skills/swe-documentation/SKILL.md]
+    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-tester-agent.md, skills/swe-documentation/SKILL.md]
   gates:
-    - after: swe-tester-agent → before: deploy (tests must pass)
-    - after: deploy → before: validate (deploy must succeed)
-    - after: validate → swe-documentation (always runs, self-assesses impact)
+    - after: swe-tester-agent → before: swe-documentation (tests must pass)
 ```

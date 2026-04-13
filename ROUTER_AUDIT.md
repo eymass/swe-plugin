@@ -1,5 +1,41 @@
 # Router Audit
 
+## 2026-04-13 — Create `swe-linter` Agent
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` | ✅ |
+| 3 | Explored existing agents and `create-subagent` skill | ✅ |
+| 4 | Agent created: `agents/swe-linter.md` | ✅ |
+| 5 | `plugin.json` updated with new agent registration | ✅ |
+
+**Task:** Create a generic subagent that discovers and runs project-defined lint and type-check commands, producing structured pass/fail output  
+**Pipeline:** `dev-implementation` → code-implementation  
+**Agent produced:** `agents/swe-linter.md` — lint and type-check specialist; discovers Makefile/package.json/pyproject.toml/CI config; never invents commands; structured Router Contract output
+
+---
+
+## 2026-04-13 — Slim `dev-implementation` pipeline, remove `code` intent
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `code` | ✅ |
+| 3 | Skill loaded: `skills/code-implementation/SKILL.md` | ✅ |
+| 4 | Removed `code` intent from detection table | ✅ |
+| 5 | Removed `### code` pipeline section | ✅ |
+| 6 | Removed deployer + validator steps from `dev-implementation` | ✅ |
+| 7 | Updated Router Contract YAML | ✅ |
+
+**Task:** Remove `code` pipeline entirely; strip heroku-cloud deploy + validate from `dev-implementation`
+**Pipeline:** `code` → code-implementation skill
+**Changes:** `skills/swe-router/SKILL.md`
+
+---
+
+
+
 ## 2026-04-11 — Register `swe-system-design` in swe-router
 
 | Step | Route | Status |
