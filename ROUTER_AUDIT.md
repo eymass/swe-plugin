@@ -1,5 +1,22 @@
 # Router Audit
 
+## 2026-04-13 — Wire `swe-linter` into `dev-implementation` pipeline
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` | ✅ |
+| 3 | Read `skills/swe-router/SKILL.md` | ✅ |
+| 4 | Added `swe-linter` step between code-implementation and swe-tester-agent | ✅ |
+| 5 | Added gate: swe-linter BLOCKING → stops before swe-tester-agent | ✅ |
+| 6 | Updated Router Contract YAML | ✅ |
+
+**Task:** Add `swe-linter` agent to the `dev-implementation` pipeline  
+**Changes:** `skills/swe-router/SKILL.md` — pipeline sequence, gate rules, Router Contract  
+**New pipeline:** `code-implementation → swe-linter → swe-tester-agent → swe-documentation`
+
+---
+
 ## 2026-04-13 — Create `swe-linter` Agent
 
 | Step | Route | Status |
