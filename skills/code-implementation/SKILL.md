@@ -1,7 +1,7 @@
 -----
 
 ## name: code-implementation
-description: "Governs all code creation and modification. Enforces: understand before writing, match existing patterns, minimal diffs, edge case coverage.”
+description: "Enforces: understand before writing, match existing patterns, minimal diffs, edge case coverage.”
 allowed-tools: Read, Grep, Glob, Write, Edit, LSP
 
 # Code Implementation
