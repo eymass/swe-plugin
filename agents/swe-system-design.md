@@ -362,7 +362,100 @@ Every sync call to another service MUST implement:
 - Every consumer MUST have a dead letter queue for failed processing
 - Every consumer MUST have monitoring and alerting on queue depth and processing failures
 
-> **GATE 4: Every API endpoint has defined request/response schemas. Every sync call has timeout + retry + circuit breaker. Every async flow has idempotent consumers with dead letter handling. No fire-and-forget without explicit justification.**
+### 4.5 — CONTRACTS.md (Mandatory Output)
+
+At the conclusion of Phase 4, produce `features/<feature-name>/CONTRACTS.md`. This file is the single authoritative reference for every integration boundary in the feature. Downstream implementers — engineers, code-generation agents, reviewers — must be able to implement any integration correctly using only this file, without reading the design.
+
+**Required sections:**
+
+```markdown
+# Contracts — <feature-name>
+
+## 1. Internal APIs
+
+For every endpoint this feature exposes or modifies:
+
+### POST /resource (or the relevant method + path)
+**Auth:** Bearer JWT — requires permission `<permission-name>`
+**Request body:**
+| Field        | Type     | Required | Constraints          |
+|--------------|----------|----------|----------------------|
+| fieldName    | string   | yes      | max 255 chars        |
+
+**Success response — 200:**
+| Field        | Type     | Notes                |
+|--------------|----------|----------------------|
+| data.id      | string   | UUID v4              |
+
+**Error responses:**
+| Status | Code              | When                        |
+|--------|-------------------|-----------------------------|
+| 400    | VALIDATION_ERROR  | Missing required fields     |
+| 409    | CONFLICT          | Duplicate idempotency key   |
+
+**Idempotency:** `Idempotency-Key` header — server stores result 24h.
+
+---
+
+## 2. External API Calls
+
+For every third-party or platform API this feature calls:
+
+### <Provider> — <Operation name>
+**Endpoint:** `POST https://api.provider.com/v1/resource`
+**Auth:** `Authorization: Bearer <token>` (env: `PROVIDER_API_KEY`)
+**Spec source:** <link to OpenAPI spec or official docs page>
+
+**Request body (all fields verified against spec):**
+| Field        | Type     | Required | Source / Notes       |
+|--------------|----------|----------|----------------------|
+| fieldName    | string   | yes      | From <internal model>|
+
+**Success response (2xx) — fields consumed:**
+| Field         | Type   | Notes                  |
+|---------------|--------|------------------------|
+| response.id   | string | Stored as externalId   |
+
+**Error handling:**
+| Status / code | Classification | Strategy                   |
+|---------------|---------------|----------------------------|
+| 429           | Transient     | Retry with backoff, max 3  |
+| 400           | Business      | Log + surface to caller    |
+| 5xx           | Transient     | Circuit breaker + retry    |
+
+---
+
+## 3. Events
+
+For every event published or consumed:
+
+### Published: `<domain>.<entity>.<action>`
+**Payload:**
+| Field         | Type     | Required | Notes                |
+|---------------|----------|----------|----------------------|
+| eventId       | string   | yes      | UUID, for idempotency|
+| correlationId | string   | yes      | Propagated from request|
+
+### Consumed: `<domain>.<entity>.<action>`
+**Idempotency key:** `eventId`
+**Out-of-order handling:** compare `timestamp` against stored value, ignore if stale.
+**Dead letter queue:** `<queue-name>-dlq`
+
+---
+
+## 4. Open Contract Questions
+
+| # | Question | Status | Decision |
+|---|----------|--------|----------|
+| 1 |          | OPEN   |          |
+```
+
+**Rules:**
+- Every field in every request body must be verified against the provider's canonical spec (OpenAPI, SDK types, or official docs) before this file is written. Do not infer field names from context.
+- Spec source links are mandatory for external API sections.
+- This file is updated whenever Phase 4 changes. It is never allowed to drift from the actual integration.
+
+> **GATE 4: Every API endpoint has defined request/response schemas. Every sync call has timeout + retry + circuit breaker. Every async flow has idempotent consumers with dead letter handling. No fire-and-forget without explicit justification. `CONTRACTS.md` is written and complete.**
 
 -----
 
@@ -569,7 +662,7 @@ When you receive a feature to design, execute this internal reasoning chain in o
 3. QUESTION: What did the spec NOT say? What assumptions am I making?
 4. OWN: Who owns each piece of state? Where are the write boundaries?
 5. FAIL: What breaks? What's the compensation? What's the blast radius?
-6. CONNECT: How do components talk? Sync or async? What are the contracts?
+6. CONNECT: How do components talk? Sync or async? What are the contracts? → Write CONTRACTS.md.
 7. PROTECT: Who can do what? Where is it enforced? What about edge cases?
 8. VALIDATE: Walk the scenarios. Break your own design before someone else does.
 9. SEQUENCE: What ships first? What proves the architecture? What reduces risk earliest?
@@ -645,7 +738,16 @@ Each component `DESIGN.md` contains only what is relevant to that service:
 
 > The system-level doc defines *what* crosses boundaries. The component docs define *how* each service implements its part.
 
+### Contracts
+
+```
+features/<feature-name>/CONTRACTS.md
+```
+
+Produced at the end of Phase 4. Contains the complete, verified contract for every integration boundary: internal endpoints, external API calls (all fields verified against canonical spec), and events. This is the downstream guide — implementers and agents must be able to build any integration using only this file.
+
 ### Rules
 
 - Reference existing docs — do not copy architecture or service details into any design. Link to them.
 - The system-level `DESIGN.md` links to each component `DESIGN.md` and vice versa.
+- `CONTRACTS.md` links are included in the system-level `DESIGN.md` under an "Integration Contracts" section.
