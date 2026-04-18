@@ -15,6 +15,7 @@ Before executing ANY task:
 2. Wait for approval (or auto-proceed after writing)
 3. Execute steps one at a time, checking off as you go
 4. Never skip a step without marking it [SKIPPED] with reason
+5. **CRITICAL** The todolist should also list the pipeline steps
 
 # SWE Router
 
@@ -29,8 +30,7 @@ Read the user's request and classify it into one of the intent categories below.
 | Intent | Signals |
 |--------|---------|
 | `system-design` | system design, architecture, service design, bounded context, ADR, architecture decision, scalability design, data model, capacity planning, service boundary, tech selection, technology selection, design document, DESIGN.md |
-| `plan` | plan, design, architect, roadmap, strategy, how should I, what's the best way, diagram |
-| `frontend` | ui, design, visual, layout, component, page, dashboard, css, html, artifact, mockup, react, state, hook, form, accessibility, animation, frontend, responsive |
+| `plan` | plan, design, architect, roadmap, strategy, how should I, what's the best way, diagram ||
 | `test` | test, spec, tdd, unit test, integration test, run tests |
 | `deploy` | deploy, ship, push to production, push to test, release, new app, create app, new heroku, bootstrap app |
 | `validate` | validate deployment, check deployment, is it live, health check |
@@ -68,18 +68,6 @@ Invoke the system design agent. It follows the full multi-phase design methodolo
 
 ---
 
-### `frontend`
-**Pipeline:** frontend-development → code-implementation
-
-```
-→ skills/frontend-development/SKILL.md
-→ skills/code-implementation/SKILL.md
-```
-
-1. Load `frontend-development` for component architecture, user flow, state, accessibility
-2. Load `code-implementation` to implement following project patterns
-
----
 
 ### `test`
 **Pipeline:** swe-tester-agent
@@ -171,7 +159,6 @@ router:
   pipelines:
     system-design:      [agents/swe-system-design.md]
     plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md]
-    frontend:           [skills/frontend-development/SKILL.md, skills/code-implementation/SKILL.md]
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
