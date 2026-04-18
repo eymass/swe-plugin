@@ -15,6 +15,7 @@ Before executing ANY task:
 2. Wait for approval (or auto-proceed after writing)
 3. Execute steps one at a time, checking off as you go
 4. Never skip a step without marking it [SKIPPED] with reason
+5. **CRITICAL** The todolist should also list the pipeline steps
 
 # SWE Router
 
