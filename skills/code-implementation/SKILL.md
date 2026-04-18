@@ -133,6 +133,7 @@ If you catch yourself doing any of these, stop and return to the Context Gate:
 - Skipping error handling for “unlikely” cases.
 - Creating an abstraction that has only one consumer.
 - Modifying files you haven’t read in this session.
+- Writing an external API request body before fetching the canonical contract.
 
 -----
 
@@ -146,3 +147,4 @@ Before delivering code, verify:
 - [ ] All failure paths handled.
 - [ ] Diff contains only task-relevant changes.
 - [ ] No speculative features, no dead code, no TODOs.
+- [ ] Every external API request body field verified against the canonical contract (OpenAPI spec, SDK types, or official docs).
