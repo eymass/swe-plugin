@@ -33,15 +33,15 @@ If input is vague, proceed with stated assumptions and surface questions in outp
 
 ### 1. Context Retrieval (max 3 cycles)
 
-Before designing, retrieve evidence from the repo:
+Before designing, retrieve evidence from the repo and external integrations contracts:
 
-| Cycle | Action |
-|-------|--------|
-| 1 — DISPATCH | Search for related files, existing patterns, similar implementations |
-| 2 — EVALUATE | Score relevance (0–1). Note naming conventions, data models, entry points |
-| 3 — REFINE | Deep-read high-relevance files. Fill remaining gaps |
+| Cycle | Action                                                                                                                   |
+|-------|--------------------------------------------------------------------------------------------------------------------------|
+| 1 — DISPATCH | Search for related files, existing patterns, similar implementations, contracts with external APIs (OpenAPI, Swagger...) |
+| 2 — EVALUATE | Score relevance (0–1). Note naming conventions, data models, entry points                                                |
+| 3 — REFINE | Deep-read high-relevance files. Fill remaining gaps                                                                      |
 
-Stop when you understand: existing patterns, entry points, dependencies, constraints.
+Stop when you understand: existing patterns, entry points, dependencies, constraints, contracts and APIs exact requests body.
 
 ```bash
 # Discovery tools to use
