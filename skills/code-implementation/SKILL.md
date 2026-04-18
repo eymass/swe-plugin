@@ -32,6 +32,9 @@ Every code path must account for: empty/null/undefined inputs, invalid inputs, e
 **Law 6 — No speculative complexity.**
 Do not add parameters, config options, abstractions, or extension points that the current task does not require. Build what is needed now.
 
+**Law 7 — Verify external API contracts before implementation.**
+Before writing any code that calls an external API, retrieve the exact request/response contract: required fields, optional fields, field types, enum values, nesting structure, auth headers, and error shapes. Do not infer the contract from variable names, docs snippets, or memory. Fetch or read the canonical spec (OpenAPI, official docs, SDK source). Partial or assumed contracts produce broken integrations.
+
 -----
 
 ## Context Gate
@@ -71,14 +74,32 @@ Extract: naming conventions, import style, export style, error handling pattern,
 
 ### Step 3 — Trace usage with LSP
 
-|When you need to…                  |Do this                                  |
-|-----------------------------------|-----------------------------------------|
-|Understand how a function is used  |`lspFindReferences` on it                |
-|See what calls a function          |`lspCallHierarchy(incoming)` on it       |
-|Verify an import target exists     |`lspGotoDefinition` on the symbol        |
-|See how an interface is implemented|`lspFindReferences` on the interface name|
+| When you need to…                   | Do this                                   |
+|--------------------------------------|-------------------------------------------|
+| Understand how a function is used    | `lspFindReferences` on it                 |
+| See what calls a function            | `lspCallHierarchy(incoming)` on it        |
+| Verify an import target exists       | `lspGotoDefinition` on the symbol         |
+| See how an interface is implemented  | `lspFindReferences` on the interface name |
 
 **Rule:** Always get `lineHint` from Grep or Read first. Never guess line numbers for LSP calls.
+
+### Step 3a — Collect external API contract (mandatory when calling any external API)
+
+Before writing a single line of integration code, retrieve the **full, canonical contract** for every external endpoint you will call:
+
+- **Required fields** — what must be present in the request body/headers.
+- **Optional fields** — what may be omitted and their defaults.
+- **Field types and formats** — strings vs enums, date formats, nested object shapes.
+- **Auth mechanism** — header name, token format, scoping rules.
+- **Success response shape** — fields you will consume.
+- **Error response shape** — status codes, error body structure, retryable vs fatal.
+
+Sources to use (in priority order):
+1. Official OpenAPI / Swagger spec fetched from the provider.
+2. Official SDK source code (type definitions are authoritative).
+3. Official prose documentation page fetched via WebFetch.
+
+**Do not proceed to Step 4 until every field in your planned request body is verified against one of these sources.** Guessing field names from context, memory, or doc snippets is a Stop Signal.
 
 ### Step 4 — Write code
 
