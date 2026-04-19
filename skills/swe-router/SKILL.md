@@ -11,11 +11,11 @@ description: |
 ---
 
 Before executing ANY task:
-1. Write a TODO.md with numbered steps
+1. Create a scope and maintain a TODO markdown file with numbered steps
 2. Wait for approval (or auto-proceed after writing)
 3. Execute steps one at a time, checking off as you go
 4. Never skip a step without marking it [SKIPPED] with reason
-5. **CRITICAL** The todolist should also list the pipeline steps
+5. **CRITICAL** The todolist should ALL pipeline exact steps
 
 # SWE Router
 
