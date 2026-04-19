@@ -44,7 +44,7 @@ Answer these before writing any code. Write the answers to yourself — do not s
 1. **What must this code do?** — Describe the behavior, not the shape.
 1. **What are the inputs and outputs?** — Data types, formats, side effects.
 1. **What breaks?** — Edge cases, failure modes, invalid states.
-1. **What patterns exist?** — How does this codebase solve similar problems? (Requires reading code — see Discovery below.)
+1. **What patterns exist?** — How does this codebase solve similar problems? Check `CONVENTION.md` first (Step 0), then read similar code. (Requires reading code — see Discovery below.)
 1. **Is there a simpler way?** — If yes, prefer it. If two approaches are close, present both with tradeoffs and ask the user.
 
 Only proceed to implementation after all five are answered.
@@ -54,6 +54,19 @@ Only proceed to implementation after all five are answered.
 ## Discovery Workflow
 
 Execute in this order. Do not skip steps.
+
+### Step 0 — Load repo conventions (mandatory, always first)
+
+Before reading any code, check whether the repo declares its own rules:
+
+```
+Glob(pattern="**/CONVENTION.md")
+Glob(pattern="**/CONVENTIONS.md")
+```
+
+If found, read every match in full. Treat its contents as **hard constraints** for the entire implementation — naming rules, import style, file structure, error handling idioms, forbidden patterns, and anything else declared there override your defaults.
+
+If not found, proceed — you will infer conventions from the codebase in Steps 1–2 instead.
 
 ### Step 1 — Find similar code
 
@@ -111,6 +124,34 @@ Now — and only now — write the implementation.
 - No hardcoded values — use constants following the project’s pattern.
 - Self-documenting names over comments that restate the code.
 
+### Step 5 — Observability & Debuggability
+
+Code that cannot be observed cannot be debugged. Every non-trivial implementation must be inspectable at runtime without a debugger attached.
+
+**Logging levels — use them correctly:**
+
+| Level | When to use |
+|-------|-------------|
+| `ERROR` | Unrecoverable failures — operation cannot proceed, manual intervention likely needed. |
+| `WARN` | Recoverable anomalies — unexpected state, retried operations, degraded behavior. |
+| `INFO` | Key lifecycle events — service start/stop, job start/finish, significant state transitions. |
+| `DEBUG` | Internal flow details — branch taken, value resolved, sub-operation completed. Off by default in production. |
+| `TRACE` | High-frequency internals — loop iterations, raw payloads, timing samples. Never on in production. |
+
+**Rules:**
+- Match the project's existing logger (never introduce a second logging library).
+- Log at the boundary where something enters or exits a system (request received, response sent, external call made, result returned).
+- `ERROR`/`WARN` logs must include enough context to reproduce the problem: relevant IDs, inputs that caused the failure, and the error message/stack.
+- `DEBUG` logs must not log secrets, credentials, or PII — even in development.
+- Do not log inside tight loops at `INFO` or above — it will flood production logs.
+- A log line that says "something went wrong" without context is worse than no log at all.
+
+**What to instrument:**
+- Entry/exit of every public function that crosses a module boundary (at `DEBUG`).
+- Every external I/O call: before the call (with sanitized inputs) and after (with status/latency).
+- Every error path: log before re-throwing or returning an error result.
+- Every significant branch in business logic (at `DEBUG`): which path was taken and why.
+
 -----
 
 ## Decision Rules
@@ -127,6 +168,7 @@ One approach is clearly simplest and meets requirements, OR project patterns alr
 
 If you catch yourself doing any of these, stop and return to the Context Gate:
 
+- Skipping Step 0 — writing code without checking for `CONVENTION.md` first.
 - Writing code before answering all five gate questions.
 - Adding scope not in the task (“while I’m here…”).
 - Overriding a codebase pattern with a personal preference.
@@ -141,6 +183,7 @@ If you catch yourself doing any of these, stop and return to the Context Gate:
 
 Before delivering code, verify:
 
+- [ ] `CONVENTION.md` searched for and loaded (or confirmed absent) before writing any code.
 - [ ] All five Context Gate questions answered.
 - [ ] All modified files were read first.
 - [ ] Implementation matches discovered project patterns.
@@ -148,3 +191,4 @@ Before delivering code, verify:
 - [ ] Diff contains only task-relevant changes.
 - [ ] No speculative features, no dead code, no TODOs.
 - [ ] Every external API request body field verified against the canonical contract (OpenAPI spec, SDK types, or official docs).
+- [ ] Logging added at appropriate levels — errors include context, debug logs sanitized, no logging inside tight loops at INFO+.

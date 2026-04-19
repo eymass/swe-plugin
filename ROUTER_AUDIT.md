@@ -1,5 +1,40 @@
 # Router Audit
 
+## 2026-04-19 — Add CONVENTION.md discovery step to `code-implementation` SKILL.md
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` | ✅ |
+| 3 | Added Step 0 — Load repo conventions (CONVENTION.md glob before any code reading) | ✅ |
+| 4 | Updated Context Gate Q4 to reference CONVENTION.md | ✅ |
+| 5 | Added Stop Signal: skipping Step 0 | ✅ |
+| 6 | Added Completion Check item for CONVENTION.md | ✅ |
+| 7 | swe-linter: N/A (markdown only) | ⏭ SKIPPED |
+
+**Task:** Direct code-implementation agent to search for CONVENTION.md as a hard-constraint source before pattern-spotting  
+**Changes:** `skills/code-implementation/SKILL.md` — Step 0 in Discovery Workflow, Context Gate Q4, Stop Signals, Completion Check
+
+---
+
+## 2026-04-19 — Add observability/logging section to `code-implementation` SKILL.md
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` | ✅ |
+| 3 | Read `skills/code-implementation/SKILL.md` | ✅ |
+| 4 | Added "Step 5 — Observability & Debuggability" section with logging levels table and rules | ✅ |
+| 5 | Added logging checklist item to Completion Check | ✅ |
+| 6 | swe-linter: N/A (markdown-only change) | ⏭ SKIPPED |
+| 7 | swe-tester-agent: N/A | ⏭ SKIPPED |
+| 8 | swe-documentation: no architecture change | ⏭ SKIPPED |
+
+**Task:** Add observability & debuggability guidance (logging with levels) to code-implementation skill  
+**Changes:** `skills/code-implementation/SKILL.md` — new Step 5 section + Completion Check item
+
+---
+
 ## 2026-04-13 — Wire `swe-linter` into `dev-implementation` pipeline
 
 | Step | Route | Status |
