@@ -103,12 +103,13 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 ---
 
 ### `dev-implementation`
-**Full Development Pipeline:** code-implementation → swe-linter → swe-tester-agent → swe-documentation
+**Full Development Pipeline:** code-implementation → tests-implementation → swe-linter → swe-tester-agent → swe-documentation
 **Critical:** For all code generation tasks or feature implementation use the dev-implementation cycle.
 **Critical:** Execute each step sequentially and never skip any.
 
 ```
 → skills/code-implementation/SKILL.md
+→ skills/tests-implementation/SKILL.md
 → agents/swe-linter.md                      (always — lint + type-check after implementation)
 → agents/swe-tester-agent.md                (only if tests exist)
 → skills/swe-documentation/SKILL.md         (always — update ARCHITECTURE.md / create ADR if arch changed)
@@ -158,11 +159,11 @@ router:
   use_user_subagents: true
   pipelines:
     system-design:      [agents/swe-system-design.md]
-    plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md]
+    plan:               [agents/swe-planner.md, agents/swe-plan-challenger.md, skills/tests-implementation/SKILL.md]
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
-    dev-implementation: [skills/code-implementation/SKILL.md, agents/swe-linter.md, agents/swe-tester-agent.md, skills/swe-documentation/SKILL.md]
+    dev-implementation: [skills/code-implementation/SKILL.md, skills/tests-implementation/SKILL.md, agents/swe-linter.md, agents/swe-tester-agent.md, skills/swe-documentation/SKILL.md]
   gates:
     - after: swe-linter → before: swe-tester-agent (lint + typecheck must pass)
     - after: swe-tester-agent → before: swe-documentation (tests must pass)
