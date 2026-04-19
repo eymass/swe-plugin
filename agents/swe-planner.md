@@ -2,7 +2,7 @@
 name: swe-planner
 description: "Feature planning specialist. Use proactively when asked to plan, design, architect, or break down any feature or system change. Produces a structured plan file the team can execute against."
 tools: Read, Grep, Glob, Write, Edit, Bash
-model: sonnet
+model: opus
 permissionMode: acceptEdits
 ---
 

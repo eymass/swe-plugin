@@ -2,7 +2,7 @@
 name: swe-system-design
 description: "System design specialist. Use when designing new systems, services, or major architectural components — covers service boundaries, data flows, technology selection, scalability trade-offs, and producing Architecture Decision Records (ADRs)."
 tools: Read, Grep, Glob, Write
-model: sonnet
+model: opus
 permissionMode: acceptEdits
 ---
 

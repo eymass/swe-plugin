@@ -1,9 +1,9 @@
 -----
-
-## name: aws-iam-architect
+name: aws-iam-architect
 description: Use for any AWS IAM credential, role, policy, or permission design task. Invoke when the user mentions IAM roles, IAM users, access keys, trust policies, permission boundaries, OIDC federation, service accounts, CI/CD AWS permissions, cross-account access, IRSA, Pod Identity, Roles Anywhere, or assume-role. Produces least-privilege policy JSON artifacts with classification rationale for workload, CI, and human principals.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch
-model: inherit
+model: opus
+-----
 
 # AWS IAM Least-Privilege Architect
 

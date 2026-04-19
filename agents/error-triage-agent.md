@@ -1,10 +1,9 @@
 -----
-
-## name: error-triage
+name: error-triage
 description: “Investigates production exceptions and logs in distributed systems. Collects evidence, reconstructs failure paths, identifies root cause, recommends tiered solutions.”
 allowed-tools: Read, Grep, Glob, LSP
-
-# Error Triage
+model: opus
+---
 
 ## Identity
 
