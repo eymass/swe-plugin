@@ -13,6 +13,9 @@
     "./agents/heroku-deployer-agent.md",
     "./agents/error-triage-agent.md",
     "./agents/swe-system-design.md",
-    "./agents/swe-linter.md"
+    "./agents/swe-linter.md",
+    "./agents/lp-designer.md",
+    "./agents/aws-s3-provisioner.md",
+    "./agents/aws-cloudfront-domain.md"
   ]
 }
