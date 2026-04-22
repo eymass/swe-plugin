@@ -1,5 +1,45 @@
 # Router Audit
 
+## 2026-04-22 — Add full LP deployment pipeline (4-step: design → implement → S3 → CloudFront)
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` (pipeline + agent + skill creation) | ✅ |
+| 3 | Explored project: identified existing skills, agents, router, plugin.json | ✅ |
+| 4 | Created `agents/lp-designer.md` — UI/UX designer subagent (Step 1 of pipeline) | ✅ |
+| 5 | Created `skills/aws-s3-provisioner/SKILL.md` — S3 public website provisioner skill | ✅ |
+| 6 | Created `skills/aws-s3-provisioner/scripts/s3-provision.sh` — shell script: create/configure bucket, sync, verify | ✅ |
+| 7 | Created `agents/aws-s3-provisioner.md` — S3 provisioner subagent (scripts-only, Step 3 of pipeline) | ✅ |
+| 8 | Created `agents/aws-cloudfront-domain.md` — CloudFront + domain subagent (Step 4, wraps user Python script) | ✅ |
+| 9 | Updated `skills/swe-router/SKILL.md` — replaced 2-step landing-page pipeline with 4-step pipeline | ✅ |
+| 10 | Updated `.claude-plugin/plugin.json` — registered 3 new agents | ✅ |
+| 11 | swe-linter: N/A (markdown + shell only) | ⏭ SKIPPED |
+| 12 | swe-tester-agent: N/A (no test suite for shell scripts here) | ⏭ SKIPPED |
+| 13 | swe-documentation: no app architecture change (pipeline config only) | ⏭ SKIPPED |
+
+**Task:** Add complete landing page deployment pipeline with 4 sequential steps, each backed by a dedicated subagent or skill
+
+**Pipeline wired:**
+```
+landing-page intent →
+  Step 1: agents/lp-designer.md                         (UI/UX design brief → DESIGN.md)
+  Step 2: skills/paid-social-landing-pages/SKILL.md     (implement HTML/CSS/JS, IAB + Pixel + CAPI)
+  Step 3: agents/aws-s3-provisioner.md                  (provision S3 public website + sync files)
+  Step 4: agents/aws-cloudfront-domain.md               (CloudFront + Lambda@Edge + ACM + Route53)
+```
+
+**New artifacts:**
+- `agents/lp-designer.md` — Phase-driven design workflow: discovery → IA → tokens → components → CTA rules → DESIGN.md output
+- `skills/aws-s3-provisioner/SKILL.md` — Skill wrapping `s3-provision.sh`; documents inputs, expected output, gates, troubleshooting
+- `skills/aws-s3-provisioner/scripts/s3-provision.sh` — Idempotent bash: create bucket if not exists, remove public block, apply public-read policy, configure website hosting, sync files, verify HTTP 200
+- `agents/aws-s3-provisioner.md` — Scripts-only subagent; validates source dir, runs script, passes endpoint to next step
+- `agents/aws-cloudfront-domain.md` — Placeholder subagent wrapping user-supplied Python script; handles new/existing domain modes; gracefully reports when script not yet provided
+
+**Rationale:** The previous `landing-page` pipeline (paid-social → aws-static) lacked a design step and used the private-S3+OAC pattern. The new pipeline adds an explicit design gate (lp-designer), a simpler public-S3 hosting path for the initial deploy (aws-s3-provisioner), and a CloudFront+domain step (aws-cloudfront-domain) that wraps the user's Python script rather than inventing commands. The pipeline is partial-run aware: existing-domain deployments skip Step 4.
+
+---
+
 ## 2026-04-21 — Register `landing-page` intent in swe-router
 
 | Step | Route | Status |

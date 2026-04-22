@@ -34,7 +34,7 @@ Read the user's request and classify it into one of the intent categories below.
 | `test` | test, spec, tdd, unit test, integration test, run tests |
 | `deploy` | deploy, ship, push to production, push to test, release, new app, create app, new heroku, bootstrap app |
 | `validate` | validate deployment, check deployment, is it live, health check |
-| `landing-page` | landing page, LP, static landing, deploy to AWS (static/S3/CloudFront), paid-social landing page, TikTok Pixel, Meta CAPI, Events API, EMQ, IAB / WebView / WKWebView, pixel proxy, CloudWatch RUM, "make this ready for Meta/TikTok/Google Ads traffic", pixel integration |
+| `landing-page` | landing page, LP, static landing, deploy to AWS (static/S3/CloudFront), paid-social landing page, TikTok Pixel, Meta CAPI, Events API, EMQ, IAB / WebView / WKWebView, pixel proxy, CloudWatch RUM, "make this ready for Meta/TikTok/Google Ads traffic", pixel integration, design LP, build landing page, upload to S3, provision bucket, CloudFront distribution, buy domain |
 | `dev-implementation` | develop AND test AND deploy in one request, "build and ship", "implement and deploy" |
 
 ---
@@ -104,17 +104,31 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 ---
 
 ### `landing-page`
-**Pipeline:** paid-social-landing-pages → aws-static-landing-pages
+**Full Pipeline:** lp-designer → paid-social-landing-pages → aws-s3-provisioner → aws-cloudfront-domain
 
 ```
-→ skills/paid-social-landing-pages/SKILL.md   (build + instrument: IAB detection, Pixel + CAPI, viewport fallbacks, consent)
-→ skills/aws-static-landing-pages/SKILL.md    (deploy: S3 + CloudFront, edge routing, cache policy, invalidation)
+→ agents/lp-designer.md                           (Step 1: UI/UX design brief — DESIGN.md)
+→ skills/paid-social-landing-pages/SKILL.md       (Step 2: implement HTML/CSS/JS static files)
+→ agents/aws-s3-provisioner.md                    (Step 3: provision S3 public website bucket + sync)
+→ agents/aws-cloudfront-domain.md                 (Step 4: CloudFront + Lambda@Edge + ACM + Route53 + domain)
 ```
 
-1. Load `paid-social-landing-pages` first when the LP is for paid social traffic (TikTok / Meta / Snap / Pinterest). It covers content, tracking, and IAB mitigations.
-2. Load `aws-static-landing-pages` to ship the LP to AWS — S3 origin with OAC, CloudFront distribution, edge routing variants, and cache invalidation.
-3. If the user only asks for deploy (no paid-social instrumentation), skip step 1 and load `aws-static-landing-pages` alone.
-4. If the user only asks for content/tracking work (no deploy), skip step 2 and load `paid-social-landing-pages` alone.
+**Pipeline rules:**
+
+1. **Step 1 — Design** (`lp-designer`): Always runs first for new LPs. Produces `features/<lpname>/DESIGN.md`. Skip only if a DESIGN.md already exists and the user confirms it is current.
+
+2. **Step 2 — Implement** (`paid-social-landing-pages`): Builds static HTML/CSS/JS files following IAB mitigations, Pixel + CAPI wiring, viewport fallbacks, and performance rules. Output is a built directory (e.g. `dist/` or `/<lpname>/`). Skip if user provides pre-built files.
+
+3. **Step 3 — S3 Upload** (`aws-s3-provisioner`): Runs `scripts/s3-provision.sh` — creates bucket if needed, removes public block, applies public website policy, syncs files, verifies HTTP 200. Gate: do not proceed to Step 4 if endpoint is not HTTP 200.
+
+4. **Step 4 — CloudFront + Domain** (`aws-cloudfront-domain`): Runs the user-supplied Python provisioning script — creates distribution with Lambda@Edge viewer-request, ACM cert, Route 53 records. **Skip this step when the domain and CloudFront distribution already exist** (user confirms); in that case the pipeline ends at Step 3 with the S3 endpoint as the live URL.
+
+**Partial pipeline triggers:**
+- "Design only" → Step 1 only
+- "Build only / implement only" → Steps 1–2
+- "Deploy only (files already built)" → Steps 3–4
+- "Existing domain, just update content" → Step 2 + Step 3 only
+- "New domain, full setup" → All 4 steps
 
 ---
 
@@ -179,7 +193,7 @@ router:
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
-    landing-page:       [skills/paid-social-landing-pages/SKILL.md, skills/aws-static-landing-pages/SKILL.md]
+    landing-page:       [agents/lp-designer.md, skills/paid-social-landing-pages/SKILL.md, agents/aws-s3-provisioner.md, agents/aws-cloudfront-domain.md]
     dev-implementation: [skills/code-implementation/SKILL.md, skills/tests-implementation/SKILL.md, agents/swe-linter.md, agents/swe-tester-agent.md, skills/swe-documentation/SKILL.md]
   gates:
     - after: swe-linter → before: swe-tester-agent (lint + typecheck must pass)
