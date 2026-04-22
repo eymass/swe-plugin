@@ -34,6 +34,7 @@ Read the user's request and classify it into one of the intent categories below.
 | `test` | test, spec, tdd, unit test, integration test, run tests |
 | `deploy` | deploy, ship, push to production, push to test, release, new app, create app, new heroku, bootstrap app |
 | `validate` | validate deployment, check deployment, is it live, health check |
+| `landing-page` | landing page, LP, static landing, deploy to AWS (static/S3/CloudFront), paid-social landing page, TikTok Pixel, Meta CAPI, Events API, EMQ, IAB / WebView / WKWebView, pixel proxy, CloudWatch RUM, "make this ready for Meta/TikTok/Google Ads traffic", pixel integration |
 | `dev-implementation` | develop AND test AND deploy in one request, "build and ship", "implement and deploy" |
 
 ---
@@ -102,6 +103,21 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 
 ---
 
+### `landing-page`
+**Pipeline:** paid-social-landing-pages → aws-static-landing-pages
+
+```
+→ skills/paid-social-landing-pages/SKILL.md   (build + instrument: IAB detection, Pixel + CAPI, viewport fallbacks, consent)
+→ skills/aws-static-landing-pages/SKILL.md    (deploy: S3 + CloudFront, edge routing, cache policy, invalidation)
+```
+
+1. Load `paid-social-landing-pages` first when the LP is for paid social traffic (TikTok / Meta / Snap / Pinterest). It covers content, tracking, and IAB mitigations.
+2. Load `aws-static-landing-pages` to ship the LP to AWS — S3 origin with OAC, CloudFront distribution, edge routing variants, and cache invalidation.
+3. If the user only asks for deploy (no paid-social instrumentation), skip step 1 and load `aws-static-landing-pages` alone.
+4. If the user only asks for content/tracking work (no deploy), skip step 2 and load `paid-social-landing-pages` alone.
+
+---
+
 ### `dev-implementation`
 **Full Development Pipeline:** code-implementation → tests-implementation → swe-linter → swe-tester-agent → swe-documentation
 **Critical:** For all code generation tasks or feature implementation use the dev-implementation cycle.
@@ -163,6 +179,7 @@ router:
     test:               [agents/swe-tester-agent.md]
     deploy:             [skills/heroku-cloud/SKILL.md]
     validate:           [skills/heroku-cloud/SKILL.md]
+    landing-page:       [skills/paid-social-landing-pages/SKILL.md, skills/aws-static-landing-pages/SKILL.md]
     dev-implementation: [skills/code-implementation/SKILL.md, skills/tests-implementation/SKILL.md, agents/swe-linter.md, agents/swe-tester-agent.md, skills/swe-documentation/SKILL.md]
   gates:
     - after: swe-linter → before: swe-tester-agent (lint + typecheck must pass)

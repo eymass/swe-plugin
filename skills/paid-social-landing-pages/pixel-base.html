@@ -1,0 +1,91 @@
+<!--
+  TikTok Pixel base — consent-gated (2025-2026 method list).
+
+  Usage:
+  1. Replace YOUR_PIXEL_ID with the pixel from Events Manager.
+  2. Call ttq.grantConsent() ONLY after your CMP records opt-in.
+  3. For US state privacy laws (CA, VA, CO, CT, UT), pass limited_data_use: true
+     on every event (TikTok's Meta-LDU equivalent — TikTok has no Google
+     Consent Mode v2 analog).
+  4. Share a UUID event_id between this client pixel and your server-side
+     Events API call — generate once at action time, send both sides.
+
+  CSP requirements — see templates/csp-header.txt.
+-->
+
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject = t;
+  var ttq = w[t] = w[t] || [];
+  ttq.methods = [
+    "page", "track", "identify", "instances", "debug", "on", "off", "once", "ready",
+    "alias", "group", "enableCookie", "disableCookie",
+    "holdConsent", "revokeConsent", "grantConsent"
+  ];
+  ttq.setAndDefer = function (t, e) {
+    t[e] = function () {
+      t.push([e].concat([].slice.call(arguments, 0)));
+    };
+  };
+  for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+  ttq.load = function (e, n) {
+    var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
+    ttq._i = ttq._i || {}; ttq._i[e] = [];
+    ttq._i[e]._u = i;
+    ttq._t = ttq._t || {}; ttq._t[e] = +new Date;
+    ttq._o = ttq._o || {}; ttq._o[e] = n || {};
+    var o = d.createElement("script"); o.async = !0;
+    o.src = i + "?sdkid=" + e + "&lib=" + t;
+    var a = d.getElementsByTagName("script")[0];
+    a.parentNode.insertBefore(o, a);
+  };
+
+  // Hold consent until CMP opt-in. For GDPR, this is mandatory before any fire.
+  ttq.holdConsent();
+  ttq.load('YOUR_PIXEL_ID');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+
+<!--
+  Example: fire a Purchase event with a shared event_id and EMQ identifiers.
+  Call this on the thank-you page after a confirmed conversion.
+
+  The same event_id MUST be sent server-side to the Events API for dedup.
+-->
+
+<script>
+// Generate once at conversion time; persist on the server; echo back to client.
+const eventId = 'evt_' + crypto.randomUUID();
+
+ttq.track('Purchase', {
+  contents: [{
+    content_id: 'SKU_123',
+    content_name: 'Blue Widget',
+    quantity: 1,
+    price: 99.99
+  }],
+  content_type: 'product',
+  currency: 'USD',
+  value: 99.99,
+  order_id: 'ORDER-10045'
+}, {
+  event_id: eventId
+});
+</script>
+
+<!--
+  Consent flow example (using a generic CMP). Fire grantConsent when user accepts.
+-->
+
+<script>
+window.addEventListener('cmp:consent-granted', function (e) {
+  if (e.detail.categories.includes('marketing')) {
+    ttq.grantConsent();
+  }
+});
+
+window.addEventListener('cmp:consent-revoked', function () {
+  ttq.revokeConsent();
+});
+</script>

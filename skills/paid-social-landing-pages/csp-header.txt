@@ -1,0 +1,57 @@
+# Content-Security-Policy header — paid-social landing page baseline
+#
+# Configured to allow the TikTok Pixel and Events API calls while keeping
+# the defaults strict. Serve as a response header from CloudFront Functions
+# or from the origin. Do not inline in <meta http-equiv="Content-Security-Policy">
+# — header form supports more directives and is preferred.
+#
+# Note: CSP does NOT block host-app JavaScript injection inside IABs
+# (TikTok, Meta, Snap run scripts in an isolated WKContentWorld outside
+# your policy). It does protect against XSS, rogue third parties, and
+# misconfigured analytics.
+
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://analytics.tiktok.com https://*.tiktok.com https://challenges.cloudflare.com https://*.cloudflareinsights.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob: https://analytics.tiktok.com https://*.tiktok.com;
+  font-src 'self' data:;
+  connect-src 'self' https://analytics.tiktok.com https://*.tiktok.com https://mssdk.tiktokw.us https://challenges.cloudflare.com;
+  frame-src https://*.tiktok.com https://challenges.cloudflare.com https://checkout.stripe.com https://js.stripe.com;
+  frame-ancestors 'none';
+  form-action 'self' https://checkout.stripe.com;
+  base-uri 'self';
+  object-src 'none';
+  upgrade-insecure-requests;
+
+# Companion security headers to set alongside CSP:
+
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(self "https://checkout.stripe.com"), usb=()
+X-Frame-Options: DENY
+
+# Notes:
+#
+# - `'unsafe-inline'` on script-src is needed for the TikTok Pixel bootstrap
+#   snippet. To drop it, replace the inline pixel bootstrap with a nonce or
+#   hash. Most teams leave 'unsafe-inline' for pragmatic reasons; it's an
+#   accepted trade-off on landers where the main XSS vector (user-generated
+#   content) is usually absent.
+#
+# - Add Meta / Pinterest / Snap pixel domains to script-src, connect-src, and
+#   img-src as needed. Keep the directive tight — only domains you actually use.
+#
+# - `frame-src` includes Stripe hosted Checkout. Remove if you don't use Stripe.
+#
+# - `form-action 'self' https://checkout.stripe.com` is needed if any form
+#   POSTs to Stripe directly.
+#
+# - `upgrade-insecure-requests` is safe once you've audited that every asset
+#   is https. Do NOT combine with http pixel endpoints.
+#
+# - Permissions-Policy `payment=(self "https://checkout.stripe.com")` enables
+#   the Payment Request API on your own origin and on the Stripe-hosted checkout.
+#   Without this directive (or if set too restrictively), Apple Pay / Google Pay
+#   will not render even in Safari / Chrome.

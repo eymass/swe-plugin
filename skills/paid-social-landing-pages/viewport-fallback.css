@@ -1,0 +1,50 @@
+/*
+  Layered viewport fallback for the TikTok IAB 100vh bug.
+  Inside TikTok's WKWebView, `100vh`, `100svh`, `100lvh`, and `100dvh` all
+  collapse to the same dynamic value because the host app does not call
+  `setMinimumViewportInset:maximumViewportInset:` (WebKit bug 255852, open).
+
+  Layer four declarations:
+    1. 100vh                     — universal fallback for old browsers
+    2. 100svh                    — small viewport, modern browsers
+    3. 100dvh                    — dynamic viewport, most recent browsers
+    4. calc(var(--vh) * 100)     — JS-computed, only correct fallback in TikTok IAB
+
+  The last value wins in browsers that support custom properties.
+  Requires the JS snippet below.
+*/
+
+.hero {
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+/*
+  Safe-area padding for sticky/fixed bottom CTAs. TikTok's IAB bottom chrome
+  is roughly 60px on iPhone, 48px on Android. Combine env() with a literal
+  buffer so the CTA never hides behind the chrome.
+*/
+
+.sticky-cta {
+  position: sticky;
+  bottom: 0;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+/*
+  Prevent rubber-band scroll on iOS / scroll-chaining on Android. Put on
+  the main scroll container, not the body (body can break scroll restore).
+*/
+
+main {
+  overscroll-behavior: none;
+}
+
+/*
+  Required meta viewport tag (paste in <head>):
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+*/

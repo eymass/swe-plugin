@@ -1,0 +1,67 @@
+{
+  "_comment": "TikTok Events API v1.3 payload template. POST to https://business-api.tiktok.com/open_api/v1.3/event/track/ with header Access-Token: <your-token>. Remove the _comment keys before sending. Remove test_event_code before production. Hash all PII fields with SHA-256 server-side AFTER normalization — never hash in the browser.",
+
+  "event_source": "web",
+  "event_source_id": "CXXXXXXXXXXXXXXXXXXX",
+
+  "_comment_test": "Set test_event_code during development; Events Manager Test Events tab shows incoming events. Remove for production.",
+  "test_event_code": "TEST12345",
+
+  "data": [
+    {
+      "event": "Purchase",
+
+      "_comment_time": "Unix timestamp in seconds. Event time, not ingest time.",
+      "event_time": 1761100000,
+
+      "_comment_id": "Shared UUID between client Pixel and this server call. TikTok dedupes by pixel_code + event + event_id within 48h. Within 5 min, events are merged (server identifiers enrich client event).",
+      "event_id": "evt_9f3c2b1a-7e0f-4a10-9b21-5c9d",
+
+      "user": {
+        "_comment_hashed": "The following fields must be SHA-256 hashed AFTER normalization.",
+
+        "email": "<sha256 of normalized email>",
+        "phone": "<sha256 of E.164 phone, digits only>",
+        "external_id": "<sha256 of stable user or cookie ID>",
+        "first_name": "<sha256 of lowercased given name>",
+        "last_name": "<sha256 of lowercased family name>",
+        "date_of_birth": "<sha256 of YYYYMMDD>",
+        "ct": "<sha256 of lowercase city>",
+        "st": "<sha256 of lowercase state / ISO 3166-2>",
+        "zp": "<sha256 of lowercase zip, no spaces>",
+        "country": "<sha256 of ISO 3166-1 alpha-2>",
+
+        "_comment_raw": "IP, user_agent, ttclid, ttp are NOT hashed.",
+
+        "ip": "203.0.113.42",
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1",
+        "ttclid": "E.C.P.v3fQ…",
+        "ttp": "94e2a4j9-h3ss-…"
+      },
+
+      "properties": {
+        "currency": "USD",
+        "value": 99.99,
+        "order_id": "ORDER-10045",
+        "contents": [
+          {
+            "content_id": "SKU_123",
+            "content_name": "Blue Widget",
+            "content_category": "widgets",
+            "quantity": 1,
+            "price": 99.99,
+            "content_type": "product"
+          }
+        ]
+      },
+
+      "page": {
+        "url": "https://example.com/ty",
+        "referrer": "https://example.com/checkout"
+      },
+
+      "_comment_ldu": "Set to true for users in California, Virginia, Colorado, Connecticut, Utah (US state privacy laws). TikTok's LDU is the Meta-LDU equivalent. TikTok has NO Google Consent Mode v2 analog — use revokeConsent/grantConsent on the client for GDPR.",
+      "limited_data_use": false
+    }
+  ]
+}

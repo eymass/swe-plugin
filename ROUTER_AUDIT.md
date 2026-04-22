@@ -1,5 +1,26 @@
 # Router Audit
 
+## 2026-04-21 — Register `landing-page` intent in swe-router
+
+| Step | Route | Status |
+|------|-------|--------|
+| 1 | `swe-router` invoked | ✅ |
+| 2 | Intent classified: `dev-implementation` (router config edit) | ✅ |
+| 3 | Read `skills/swe-router/SKILL.md` and new skill descriptions | ✅ |
+| 4 | Added `landing-page` row to intent detection table | ✅ |
+| 5 | Added `### landing-page` pipeline section (paid-social → aws-static) | ✅ |
+| 6 | Updated Router Contract YAML with `landing-page` entry | ✅ |
+| 7 | swe-linter: N/A (markdown only) | ⏭ SKIPPED |
+| 8 | swe-tester-agent: N/A | ⏭ SKIPPED |
+| 9 | swe-documentation: no architecture change | ⏭ SKIPPED |
+
+**Task:** Register two new skills (`aws-static-landing-pages`, `paid-social-landing-pages`) with the swe-router under a new `landing-page` intent
+**Pipeline:** `landing-page` → paid-social-landing-pages → aws-static-landing-pages
+**Changes:** `skills/swe-router/SKILL.md` — new intent row, pipeline block, and contract entry
+**Rationale:** The two skills are complementary — paid-social handles content/tracking/IAB, aws-static handles deploy. Default order runs build-then-deploy; skill descriptions still allow each to trigger independently when the user's ask is scoped to one layer.
+
+---
+
 ## 2026-04-19 — Add CONVENTION.md discovery step to `code-implementation` SKILL.md
 
 | Step | Route | Status |
