@@ -138,6 +138,7 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 **Critical:** Execute each step sequentially and never skip any.
 
 ```
+→ skills/
 → skills/code-implementation/SKILL.md
 → skills/tests-implementation/SKILL.md
 → agents/swe-linter.md                      (always — lint + type-check after implementation)
