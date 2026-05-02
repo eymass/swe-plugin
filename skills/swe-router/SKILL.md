@@ -138,7 +138,7 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 **Critical:** Execute each step sequentially and never skip any.
 
 ```
-→ skills/
+→ skills/swe-third-party-integration/SKILL.md
 → skills/code-implementation/SKILL.md
 → skills/tests-implementation/SKILL.md
 → agents/swe-linter.md                      (always — lint + type-check after implementation)
@@ -148,6 +148,7 @@ Load `heroku-cloud` for log analysis and HTTP health check.
 
 **Rules:**
 - Run each step sequentially — never in parallel, never skip
+- **Gate:** Dont not proceed to code-implementation if third party and APIs accurate contracts info is missing or not provided.
 - **Gate:** Do not proceed to swe-tester-agent if swe-linter reports BLOCKING failures
 - **Gate:** Do not proceed to swe-documentation if swe-tester-agent reports failures
 - **swe-documentation always runs** — it self-assesses whether the task changed the architecture and exits cleanly if not
